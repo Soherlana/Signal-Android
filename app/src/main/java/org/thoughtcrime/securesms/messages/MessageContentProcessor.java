@@ -14,12 +14,12 @@ import com.annimon.stream.Stream;
 import org.signal.core.util.logging.Log;
 import org.signal.ringrtc.CallId;
 import org.signal.zkgroup.profiles.ProfileKey;
+import org.thoughtcrime.securesms.ApplicationContext;
 import org.thoughtcrime.securesms.attachments.Attachment;
 import org.thoughtcrime.securesms.attachments.DatabaseAttachment;
 import org.thoughtcrime.securesms.attachments.PointerAttachment;
 import org.thoughtcrime.securesms.attachments.TombstoneAttachment;
 import org.thoughtcrime.securesms.attachments.UriAttachment;
-import org.thoughtcrime.securesms.components.emoji.EmojiUtil;
 import org.thoughtcrime.securesms.contactshare.Contact;
 import org.thoughtcrime.securesms.contactshare.ContactModelMapper;
 import org.thoughtcrime.securesms.crypto.ProfileKeyUtil;
@@ -34,8 +34,6 @@ import org.thoughtcrime.securesms.database.MessageDatabase;
 import org.thoughtcrime.securesms.database.MessageDatabase.InsertResult;
 import org.thoughtcrime.securesms.database.MessageDatabase.SyncMessageId;
 import org.thoughtcrime.securesms.database.MmsSmsDatabase;
-import org.thoughtcrime.securesms.database.PaymentDatabase;
-import org.thoughtcrime.securesms.database.PaymentMetaDataUtil;
 import org.thoughtcrime.securesms.database.RecipientDatabase;
 import org.thoughtcrime.securesms.database.StickerDatabase;
 import org.thoughtcrime.securesms.database.ThreadDatabase;
@@ -62,9 +60,6 @@ import org.thoughtcrime.securesms.jobs.MultiDeviceContactUpdateJob;
 import org.thoughtcrime.securesms.jobs.MultiDeviceGroupUpdateJob;
 import org.thoughtcrime.securesms.jobs.MultiDeviceKeysUpdateJob;
 import org.thoughtcrime.securesms.jobs.MultiDeviceStickerPackSyncJob;
-import org.thoughtcrime.securesms.jobs.PaymentLedgerUpdateJob;
-import org.thoughtcrime.securesms.jobs.PaymentTransactionCheckJob;
-import org.thoughtcrime.securesms.jobs.PushProcessMessageJob;
 import org.thoughtcrime.securesms.jobs.RefreshOwnProfileJob;
 import org.thoughtcrime.securesms.jobs.RequestGroupInfoJob;
 import org.thoughtcrime.securesms.jobs.RetrieveProfileJob;
@@ -82,9 +77,7 @@ import org.thoughtcrime.securesms.mms.OutgoingSecureMediaMessage;
 import org.thoughtcrime.securesms.mms.QuoteModel;
 import org.thoughtcrime.securesms.mms.SlideDeck;
 import org.thoughtcrime.securesms.mms.StickerSlide;
-import org.thoughtcrime.securesms.notifications.MarkReadReceiver;
 import org.thoughtcrime.securesms.notifications.MessageNotifier;
-import org.thoughtcrime.securesms.payments.MobileCoinPublicAddress;
 import org.thoughtcrime.securesms.recipients.Recipient;
 import org.thoughtcrime.securesms.recipients.RecipientId;
 import org.thoughtcrime.securesms.ringrtc.RemotePeer;
@@ -125,7 +118,6 @@ import org.whispersystems.signalservice.api.messages.calls.SignalServiceCallMess
 import org.whispersystems.signalservice.api.messages.multidevice.BlockedListMessage;
 import org.whispersystems.signalservice.api.messages.multidevice.ConfigurationMessage;
 import org.whispersystems.signalservice.api.messages.multidevice.MessageRequestResponseMessage;
-import org.whispersystems.signalservice.api.messages.multidevice.OutgoingPaymentMessage;
 import org.whispersystems.signalservice.api.messages.multidevice.ReadMessage;
 import org.whispersystems.signalservice.api.messages.multidevice.RequestMessage;
 import org.whispersystems.signalservice.api.messages.multidevice.SentTranscriptMessage;
@@ -134,7 +126,6 @@ import org.whispersystems.signalservice.api.messages.multidevice.StickerPackOper
 import org.whispersystems.signalservice.api.messages.multidevice.VerifiedMessage;
 import org.whispersystems.signalservice.api.messages.multidevice.ViewOnceOpenMessage;
 import org.whispersystems.signalservice.api.messages.shared.SharedContact;
-import org.whispersystems.signalservice.api.payments.Money;
 import org.whispersystems.signalservice.api.push.SignalServiceAddress;
 
 import java.io.IOException;
@@ -142,12 +133,10 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Takes data about a decrypted message, transforms it into user-presentable data, and writes that
@@ -238,16 +227,15 @@ public final class MessageContentProcessor {
           }
         }
 
-        if      (isInvalidMessage(message))                                               handleInvalidMessage(content.getSender(), content.getSenderDevice(), groupId, content.getTimestamp(), smsMessageId);
-        else if (message.isEndSession())                                                  handleEndSessionMessage(content, smsMessageId);
-        else if (message.isGroupV1Update())                                               handleGroupV1Message(content, message, smsMessageId, groupId.get().requireV1());
-        else if (message.isExpirationUpdate())                                            handleExpirationUpdate(content, message, smsMessageId, groupId);
-        else if (message.getReaction().isPresent())                                       handleReaction(content, message);
-        else if (message.getRemoteDelete().isPresent())                                   handleRemoteDelete(content, message);
-        else if (message.getPayment().isPresent())                                        handlePayment(content, message);
-        else if (isMediaMessage)                                                          handleMediaMessage(content, message, smsMessageId);
-        else if (message.getBody().isPresent())                                           handleTextMessage(content, message, smsMessageId, groupId);
-        else if (Build.VERSION.SDK_INT > 19 && message.getGroupCallUpdate().isPresent())  handleGroupCallUpdateMessage(content, message, groupId);
+        if      (isInvalidMessage(message))                                              handleInvalidMessage(content.getSender(), content.getSenderDevice(), groupId, content.getTimestamp(), smsMessageId);
+        else if (message.isEndSession())                                                 handleEndSessionMessage(content, smsMessageId);
+        else if (message.isGroupV1Update())                                              handleGroupV1Message(content, message, smsMessageId, groupId.get().requireV1());
+        else if (message.isExpirationUpdate())                                           handleExpirationUpdate(content, message, smsMessageId, groupId);
+        else if (message.getReaction().isPresent())                                      handleReaction(content, message);
+        else if (message.getRemoteDelete().isPresent())                                  handleRemoteDelete(content, message);
+        else if (isMediaMessage)                                                         handleMediaMessage(content, message, smsMessageId);
+        else if (message.getBody().isPresent())                                          handleTextMessage(content, message, smsMessageId, groupId);
+        else if (Build.VERSION.SDK_INT > 19 && message.getGroupCallUpdate().isPresent()) handleGroupCallUpdateMessage(content, message, groupId);
 
         if (groupId.isPresent() && groupDatabase.isUnknownGroup(groupId.get())) {
           handleUnknownGroupMessage(content, message.getGroupContext().get());
@@ -275,7 +263,6 @@ public final class MessageContentProcessor {
         else if (syncMessage.getBlockedList().isPresent())            handleSynchronizeBlockedListMessage(syncMessage.getBlockedList().get());
         else if (syncMessage.getFetchType().isPresent())              handleSynchronizeFetchMessage(syncMessage.getFetchType().get());
         else if (syncMessage.getMessageRequestResponse().isPresent()) handleSynchronizeMessageRequestResponse(syncMessage.getMessageRequestResponse().get());
-        else if (syncMessage.getOutgoingPaymentMessage().isPresent()) handleSynchronizeOutgoingPayment(syncMessage.getOutgoingPaymentMessage().get());
         else                                                          warn(String.valueOf(content.getTimestamp()), "Contains no known sync types...");
       } else if (content.getCallMessage().isPresent()) {
         log(String.valueOf(content.getTimestamp()), "Got call message...");
@@ -313,41 +300,6 @@ public final class MessageContentProcessor {
     } catch (BadGroupIdException e) {
       warn(String.valueOf(content.getTimestamp()), "Ignoring message with bad group id", e);
     }
-  }
-
-  private void handlePayment(@NonNull SignalServiceContent content, @NonNull SignalServiceDataMessage message) {
-    if (!message.getPayment().isPresent()) {
-      throw new AssertionError();
-    }
-
-    if (!message.getPayment().get().getPaymentNotification().isPresent()) {
-      Log.w(TAG, "Ignoring payment message without notification");
-      return;
-    }
-
-    SignalServiceDataMessage.PaymentNotification paymentNotification = message.getPayment().get().getPaymentNotification().get();
-    PaymentDatabase                              paymentDatabase     = DatabaseFactory.getPaymentDatabase(context);
-    UUID                                         uuid                = UUID.randomUUID();
-    Recipient                                    recipient           = Recipient.externalHighTrustPush(context, content.getSender());
-    String                                       queue               = "Payment_" + PushProcessMessageJob.getQueueName(recipient.getId());
-
-    try {
-      paymentDatabase.createIncomingPayment(uuid,
-                                            recipient.getId(),
-                                            message.getTimestamp(),
-                                            paymentNotification.getNote(),
-                                            Money.MobileCoin.ZERO,
-                                            Money.MobileCoin.ZERO,
-                                            paymentNotification.getReceipt());
-    } catch (PaymentDatabase.PublicKeyConflictException e) {
-      Log.w(TAG, "Ignoring payment with public key already in database");
-      return;
-    }
-
-    ApplicationDependencies.getJobManager()
-                           .startChain(new PaymentTransactionCheckJob(uuid, queue))
-                           .then(PaymentLedgerUpdateJob.updateLedger())
-                           .enqueue();
   }
 
   private static @Nullable
@@ -692,11 +644,6 @@ public final class MessageContentProcessor {
   private void handleReaction(@NonNull SignalServiceContent content, @NonNull SignalServiceDataMessage message) {
     SignalServiceDataMessage.Reaction reaction = message.getReaction().get();
 
-    if (!EmojiUtil.isEmoji(context, reaction.getEmoji())) {
-      Log.w(TAG, "Reaction text is not a valid emoji! Ignoring the message.");
-      return;
-    }
-
     Recipient     targetAuthor  = Recipient.externalPush(context, reaction.getTargetAuthor());
     MessageRecord targetMessage = DatabaseFactory.getMmsSmsDatabase(context).getMessageFor(reaction.getTargetSentTimestamp(), targetAuthor.getId());
 
@@ -846,38 +793,6 @@ public final class MessageContentProcessor {
     }
   }
 
-  private void handleSynchronizeOutgoingPayment(@NonNull OutgoingPaymentMessage outgoingPaymentMessage) {
-    RecipientId recipientId = outgoingPaymentMessage.getRecipient()
-                                                    .transform(uuid -> RecipientId.from(uuid, null))
-                                                    .orNull();
-    long timestamp = outgoingPaymentMessage.getBlockTimestamp();
-    if (timestamp == 0) {
-      timestamp = System.currentTimeMillis();
-    }
-
-    Optional<MobileCoinPublicAddress> address = outgoingPaymentMessage.getAddress().transform(MobileCoinPublicAddress::fromBytes);
-    if (!address.isPresent() && recipientId == null) {
-      Log.i(TAG, "Inserting defrag");
-      address     = Optional.of(ApplicationDependencies.getPayments().getWallet().getMobileCoinPublicAddress());
-      recipientId = Recipient.self().getId();
-    }
-
-    UUID uuid = UUID.randomUUID();
-    DatabaseFactory.getPaymentDatabase(context)
-                   .createSuccessfulPayment(uuid,
-                                            recipientId,
-                                            address.get(),
-                                            timestamp,
-                                            outgoingPaymentMessage.getBlockIndex(),
-                                            outgoingPaymentMessage.getNote().or(""),
-                                            outgoingPaymentMessage.getAmount(),
-                                            outgoingPaymentMessage.getFee(),
-                                            outgoingPaymentMessage.getReceipt().toByteArray(),
-                                            PaymentMetaDataUtil.fromKeysAndImages(outgoingPaymentMessage.getPublicKeys(), outgoingPaymentMessage.getKeyImages()));
-
-    log("Inserted synchronized payment " + uuid);
-  }
-
   private void handleSynchronizeSentMessage(@NonNull SignalServiceContent content,
                                             @NonNull SentTranscriptMessage message)
       throws StorageFailedException, BadGroupIdException, IOException, GroupChangeBusyException
@@ -987,30 +902,21 @@ public final class MessageContentProcessor {
 
   private void handleSynchronizeReadMessage(@NonNull List<ReadMessage> readMessages, long envelopeTimestamp)
   {
-    Map<Long, Long> threadToLatestRead = new HashMap<>();
     for (ReadMessage readMessage : readMessages) {
-      List<Pair<Long, Long>> expiringText  = DatabaseFactory.getSmsDatabase(context).setTimestampRead(new SyncMessageId(Recipient.externalPush(context, readMessage.getSender()).getId(), readMessage.getTimestamp()),
-                                                                                                      envelopeTimestamp,
-                                                                                                      threadToLatestRead);
-      List<Pair<Long, Long>> expiringMedia = DatabaseFactory.getMmsDatabase(context).setTimestampRead(new SyncMessageId(Recipient.externalPush(context, readMessage.getSender()).getId(), readMessage.getTimestamp()),
-                                                                                                      envelopeTimestamp,
-                                                                                                      threadToLatestRead);
+      List<Pair<Long, Long>> expiringText  = DatabaseFactory.getSmsDatabase(context).setTimestampRead(new SyncMessageId(Recipient.externalPush(context, readMessage.getSender()).getId(), readMessage.getTimestamp()), envelopeTimestamp);
+      List<Pair<Long, Long>> expiringMedia = DatabaseFactory.getMmsDatabase(context).setTimestampRead(new SyncMessageId(Recipient.externalPush(context, readMessage.getSender()).getId(), readMessage.getTimestamp()), envelopeTimestamp);
 
       for (Pair<Long, Long> expiringMessage : expiringText) {
-        ApplicationDependencies.getExpiringMessageManager()
-                               .scheduleDeletion(expiringMessage.first(), false, envelopeTimestamp, expiringMessage.second());
+        ApplicationContext.getInstance(context)
+                          .getExpiringMessageManager()
+                          .scheduleDeletion(expiringMessage.first(), false, envelopeTimestamp, expiringMessage.second());
       }
 
       for (Pair<Long, Long> expiringMessage : expiringMedia) {
-        ApplicationDependencies.getExpiringMessageManager()
-                               .scheduleDeletion(expiringMessage.first(), true, envelopeTimestamp, expiringMessage.second());
+        ApplicationContext.getInstance(context)
+                          .getExpiringMessageManager()
+                          .scheduleDeletion(expiringMessage.first(), true, envelopeTimestamp, expiringMessage.second());
       }
-    }
-
-    List<MessageDatabase.MarkedMessageInfo> markedMessages = DatabaseFactory.getThreadDatabase(context).setReadSince(threadToLatestRead, false);
-    if (Util.hasItems(markedMessages)) {
-      Log.i(TAG, "Updating past messages: " + markedMessages.size());
-      MarkReadReceiver.process(context, markedMessages);
     }
 
     MessageNotifier messageNotifier = ApplicationDependencies.getMessageNotifier();
@@ -1103,7 +1009,7 @@ public final class MessageContentProcessor {
       ApplicationDependencies.getJobManager().add(new TrimThreadJob(insertResult.get().getThreadId()));
 
       if (message.isViewOnce()) {
-        ApplicationDependencies.getViewOnceMessageManager().scheduleIfNecessary();
+        ApplicationContext.getInstance(context).getViewOnceMessageManager().scheduleIfNecessary();
       }
     }
   }
@@ -1190,11 +1096,11 @@ public final class MessageContentProcessor {
 
       if (message.getMessage().getExpiresInSeconds() > 0) {
         database.markExpireStarted(messageId, message.getExpirationStartTimestamp());
-        ApplicationDependencies.getExpiringMessageManager()
-                               .scheduleDeletion(messageId,
-                                                 true,
-                                                 message.getExpirationStartTimestamp(),
-                                                 message.getMessage().getExpiresInSeconds() * 1000L);
+        ApplicationContext.getInstance(context)
+                          .getExpiringMessageManager()
+                          .scheduleDeletion(messageId, true,
+                              message.getExpirationStartTimestamp(),
+                              message.getMessage().getExpiresInSeconds() * 1000L);
       }
 
       if (recipients.isSelf()) {
@@ -1350,8 +1256,9 @@ public final class MessageContentProcessor {
 
     if (expiresInMillis > 0) {
       database.markExpireStarted(messageId, message.getExpirationStartTimestamp());
-      ApplicationDependencies.getExpiringMessageManager()
-                             .scheduleDeletion(messageId, isGroup, message.getExpirationStartTimestamp(), expiresInMillis);
+      ApplicationContext.getInstance(context)
+                        .getExpiringMessageManager()
+                        .scheduleDeletion(messageId, isGroup, message.getExpirationStartTimestamp(), expiresInMillis);
     }
 
     if (recipient.isSelf()) {
@@ -1676,7 +1583,6 @@ public final class MessageContentProcessor {
           StickerSlide.HEIGHT,
           null,
           String.valueOf(new SecureRandom().nextLong()),
-          false,
           false,
           false,
           false,

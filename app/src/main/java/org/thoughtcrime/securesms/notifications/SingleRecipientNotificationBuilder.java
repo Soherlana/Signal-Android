@@ -268,12 +268,7 @@ public class SingleRecipientNotificationBuilder extends AbstractNotificationBuil
     if (slideDeck != null && slideDeck.getThumbnailSlide() != null) {
       Slide thumbnail = slideDeck.getThumbnailSlide();
 
-      if (Build.VERSION.SDK_INT >= 28) {
-        dataUri = thumbnail.getPublicUri();
-      } else {
-        dataUri  = thumbnail.getUri();
-      }
-
+      dataUri  = thumbnail.getUri();
       mimeType = thumbnail.getContentType();
     }
 

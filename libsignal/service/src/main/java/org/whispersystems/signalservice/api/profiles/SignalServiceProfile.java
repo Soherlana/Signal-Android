@@ -36,9 +36,6 @@ public class SignalServiceProfile {
   private String aboutEmoji;
 
   @JsonProperty
-  private byte[] paymentAddress;
-
-  @JsonProperty
   private String avatar;
 
   @JsonProperty
@@ -77,10 +74,6 @@ public class SignalServiceProfile {
 
   public String getAboutEmoji() {
     return aboutEmoji;
-  }
-
-  public byte[] getPaymentAddress() {
-    return paymentAddress;
   }
 
   public String getAvatar() {

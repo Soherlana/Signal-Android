@@ -244,9 +244,9 @@ public final class ConversationUtil {
   /**
    * @return A Person object representing the given Recipient
    */
-  @RequiresApi(28)
+  @RequiresApi(CONVERSATION_SUPPORT_VERSION)
   @WorkerThread
-  public static @NonNull Person buildPerson(@NonNull Context context, @NonNull Recipient recipient) {
+  private static @NonNull Person buildPerson(@NonNull Context context, @NonNull Recipient recipient) {
     return new Person.Builder()
                      .setKey(getShortcutId(recipient.getId()))
                      .setName(recipient.getDisplayName(context))

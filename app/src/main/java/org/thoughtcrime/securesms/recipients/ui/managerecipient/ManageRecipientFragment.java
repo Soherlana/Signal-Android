@@ -92,6 +92,7 @@ public class ManageRecipientFragment extends LoggingFragment {
   private ImageView                              colorChip;
   private View                                   blockUnblockCard;
   private TextView                               block;
+  private TextView                               report;
   private TextView                               unblock;
   private View                                   groupMembershipCard;
   private TextView                               addToAGroup;
@@ -151,6 +152,7 @@ public class ManageRecipientFragment extends LoggingFragment {
     colorChip                   = view.findViewById(R.id.color_chip);
     blockUnblockCard            = view.findViewById(R.id.recipient_block_and_leave_card);
     block                       = view.findViewById(R.id.block);
+    report                      = view.findViewById(R.id.report);
     unblock                     = view.findViewById(R.id.unblock);
     viewSafetyNumber            = view.findViewById(R.id.view_safety_number);
     groupMembershipCard         = view.findViewById(R.id.recipient_membership_card);

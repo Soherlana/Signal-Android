@@ -648,6 +648,19 @@
                         android:textColor="@color/core_red" />
 
                     <TextView
+                        android:id="@+id/report"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/group_manage_fragment_row_height"
+                        android:background="?selectableItemBackground"
+                        android:gravity="center_vertical|start"
+                        android:paddingStart="@dimen/group_manage_fragment_row_horizontal_padding"
+                        android:paddingEnd="@dimen/group_manage_fragment_row_horizontal_padding"
+                        android:text="@string/ManageRecipientActivity_report"
+                        android:textAlignment="viewStart"
+                        android:textAppearance="@style/Signal.Text.Body"
+                        android:textColor="@color/core_red" />
+
+                    <TextView
                         android:id="@+id/unblock"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/group_manage_fragment_row_height"

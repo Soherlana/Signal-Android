@@ -11,9 +11,6 @@ import org.thoughtcrime.securesms.jobs.MultiDeviceKeysUpdateJob;
 import org.thoughtcrime.securesms.jobs.StorageSyncJob;
 import org.thoughtcrime.securesms.util.TextSecurePreferences;
 
-/**
- * Just runs a storage sync. Useful if you've started syncing a new field to storage service.
- */
 public class StorageServiceMigrationJob extends MigrationJob {
 
   private static final String TAG = Log.tag(StorageServiceMigrationJob.class);
@@ -44,12 +41,12 @@ public class StorageServiceMigrationJob extends MigrationJob {
 
     if (TextSecurePreferences.isMultiDevice(context)) {
       Log.i(TAG, "Multi-device.");
-      jobManager.startChain(StorageSyncJob.create())
+      jobManager.startChain(new StorageSyncJob())
                 .then(new MultiDeviceKeysUpdateJob())
                 .enqueue();
     } else {
       Log.i(TAG, "Single-device.");
-      jobManager.add(StorageSyncJob.create());
+      jobManager.add(new StorageSyncJob());
     }
   }
 

@@ -8,7 +8,6 @@ import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 
-import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
@@ -120,18 +119,11 @@ public final class AvatarImageView extends AppCompatImageView {
    * Shows self as the actual profile picture.
    */
   public void setRecipient(@NonNull Recipient recipient) {
-    setRecipient(recipient, false);
-  }
-
-  /**
-   * Shows self as the actual profile picture.
-   */
-  public void setRecipient(@NonNull Recipient recipient, boolean quickContactEnabled) {
     if (recipient.isSelf()) {
-      setAvatar(GlideApp.with(this), null, quickContactEnabled);
+      setAvatar(GlideApp.with(this), null, false);
       AvatarUtil.loadIconIntoImageView(recipient, this);
     } else {
-      setAvatar(GlideApp.with(this), recipient, quickContactEnabled);
+      setAvatar(GlideApp.with(this), recipient, false);
     }
   }
 
@@ -213,7 +205,8 @@ public final class AvatarImageView extends AppCompatImageView {
         }
       });
     } else {
-      disableQuickContact();
+      super.setOnClickListener(listener);
+      setClickable(listener != null);
     }
   }
 
@@ -232,16 +225,6 @@ public final class AvatarImageView extends AppCompatImageView {
             .diskCacheStrategy(DiskCacheStrategy.ALL)
             .circleCrop()
             .into(this);
-  }
-
-  public void setNonAvatarImageResource(@DrawableRes int imageResource) {
-    recipientContactPhoto = null;
-    setImageResource(imageResource);
-  }
-
-  public void disableQuickContact() {
-    super.setOnClickListener(listener);
-    setClickable(listener != null);
   }
 
   private static class RecipientContactPhoto {

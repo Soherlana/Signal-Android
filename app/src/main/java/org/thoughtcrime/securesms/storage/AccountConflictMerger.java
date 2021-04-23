@@ -46,7 +46,7 @@ class AccountConflictMerger implements StorageSyncHelper.ConflictMerger<SignalAc
   }
 
   @Override
-  public @NonNull SignalAccountRecord merge(@NonNull SignalAccountRecord remote, @NonNull SignalAccountRecord local, @NonNull StorageKeyGenerator keyGenerator) {
+  public @NonNull SignalAccountRecord merge(@NonNull SignalAccountRecord remote, @NonNull SignalAccountRecord local, @NonNull StorageSyncHelper.KeyGenerator keyGenerator) {
     String givenName;
     String familyName;
 
@@ -71,10 +71,8 @@ class AccountConflictMerger implements StorageSyncHelper.ConflictMerger<SignalAc
     List<PinnedConversation>             pinnedConversations    = remote.getPinnedConversations();
     AccountRecord.PhoneNumberSharingMode phoneNumberSharingMode = remote.getPhoneNumberSharingMode();
     boolean                              preferContactAvatars   = remote.isPreferContactAvatars();
-    boolean                              paymentsEnabled        = remote.getPayments().isEnabled();
-    byte[]                               paymentsEntropy        = remote.getPayments().getEntropy().or(local.getPayments().getEntropy()).orNull();
-    boolean                              matchesRemote          = doParamsMatch(remote, unknownFields, givenName, familyName, avatarUrlPath, profileKey, noteToSelfArchived, noteToSelfForcedUnread, readReceipts, typingIndicators, sealedSenderIndicators, linkPreviews, phoneNumberSharingMode, unlisted, pinnedConversations, preferContactAvatars, paymentsEnabled, paymentsEntropy);
-    boolean                              matchesLocal           = doParamsMatch(local, unknownFields, givenName, familyName, avatarUrlPath, profileKey, noteToSelfArchived, noteToSelfForcedUnread, readReceipts, typingIndicators, sealedSenderIndicators, linkPreviews, phoneNumberSharingMode, unlisted, pinnedConversations, preferContactAvatars, paymentsEnabled, paymentsEntropy);
+    boolean                              matchesRemote          = doParamsMatch(remote, unknownFields, givenName, familyName, avatarUrlPath, profileKey, noteToSelfArchived, noteToSelfForcedUnread, readReceipts, typingIndicators, sealedSenderIndicators, linkPreviews, phoneNumberSharingMode, unlisted, pinnedConversations, preferContactAvatars);
+    boolean                              matchesLocal           = doParamsMatch(local, unknownFields, givenName, familyName, avatarUrlPath, profileKey, noteToSelfArchived, noteToSelfForcedUnread, readReceipts, typingIndicators, sealedSenderIndicators, linkPreviews, phoneNumberSharingMode, unlisted, pinnedConversations, preferContactAvatars);
 
     if (matchesRemote) {
       return remote;
@@ -98,7 +96,6 @@ class AccountConflictMerger implements StorageSyncHelper.ConflictMerger<SignalAc
                                     .setUnlistedPhoneNumber(unlisted)
                                     .setPinnedConversations(pinnedConversations)
                                     .setPreferContactAvatars(preferContactAvatars)
-                                    .setPayments(paymentsEnabled, paymentsEntropy)
                                     .build();
     }
   }
@@ -118,26 +115,22 @@ class AccountConflictMerger implements StorageSyncHelper.ConflictMerger<SignalAc
                                        AccountRecord.PhoneNumberSharingMode phoneNumberSharingMode,
                                        boolean unlistedPhoneNumber,
                                        @NonNull List<PinnedConversation> pinnedConversations,
-                                       boolean preferContactAvatars,
-                                       boolean paymentsEnabled,
-                                       @Nullable byte[] paymentsEntropy)
+                                       boolean preferContactAvatars)
   {
-    return Arrays.equals(contact.serializeUnknownFields(), unknownFields)        &&
-           Objects.equals(contact.getGivenName().or(""), givenName)              &&
-           Objects.equals(contact.getFamilyName().or(""), familyName)            &&
-           Objects.equals(contact.getAvatarUrlPath().or(""), avatarUrlPath)      &&
-           Arrays.equals(contact.getProfileKey().orNull(), profileKey)           &&
-           contact.isNoteToSelfArchived() == noteToSelfArchived                  &&
-           contact.isNoteToSelfForcedUnread() == noteToSelfForcedUnread          &&
-           contact.isReadReceiptsEnabled() == readReceipts                       &&
-           contact.isTypingIndicatorsEnabled() == typingIndicators               &&
-           contact.isSealedSenderIndicatorsEnabled() == sealedSenderIndicators   &&
-           contact.isLinkPreviewsEnabled() == linkPreviewsEnabled                &&
-           contact.getPhoneNumberSharingMode() == phoneNumberSharingMode         &&
-           contact.isPhoneNumberUnlisted() == unlistedPhoneNumber                &&
-           contact.isPreferContactAvatars() == preferContactAvatars              &&
-           Objects.equals(contact.getPinnedConversations(), pinnedConversations) &&
-           contact.getPayments().isEnabled() == paymentsEnabled                  &&
-           Arrays.equals(contact.getPayments().getEntropy().orNull(), paymentsEntropy);
+    return Arrays.equals(contact.serializeUnknownFields(), unknownFields)      &&
+           Objects.equals(contact.getGivenName().or(""), givenName)            &&
+           Objects.equals(contact.getFamilyName().or(""), familyName)          &&
+           Objects.equals(contact.getAvatarUrlPath().or(""), avatarUrlPath)    &&
+           Arrays.equals(contact.getProfileKey().orNull(), profileKey)         &&
+           contact.isNoteToSelfArchived() == noteToSelfArchived                &&
+           contact.isNoteToSelfForcedUnread() == noteToSelfForcedUnread        &&
+           contact.isReadReceiptsEnabled() == readReceipts                     &&
+           contact.isTypingIndicatorsEnabled() == typingIndicators             &&
+           contact.isSealedSenderIndicatorsEnabled() == sealedSenderIndicators &&
+           contact.isLinkPreviewsEnabled() == linkPreviewsEnabled              &&
+           contact.getPhoneNumberSharingMode() == phoneNumberSharingMode       &&
+           contact.isPhoneNumberUnlisted() == unlistedPhoneNumber              &&
+           contact.isPreferContactAvatars() == preferContactAvatars            &&
+           Objects.equals(contact.getPinnedConversations(), pinnedConversations);
   }
 }

@@ -16,7 +16,6 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.button.MaterialButton;
 
@@ -30,7 +29,6 @@ import org.thoughtcrime.securesms.database.model.GroupCallUpdateDetailsUtil;
 import org.thoughtcrime.securesms.database.model.LiveUpdateMessage;
 import org.thoughtcrime.securesms.database.model.MessageRecord;
 import org.thoughtcrime.securesms.database.model.UpdateDescription;
-import org.thoughtcrime.securesms.giph.mp4.GiphyMp4Projection;
 import org.thoughtcrime.securesms.mms.GlideRequests;
 import org.thoughtcrime.securesms.recipients.LiveRecipient;
 import org.thoughtcrime.securesms.recipients.Recipient;
@@ -42,7 +40,6 @@ import org.thoughtcrime.securesms.util.Util;
 import org.thoughtcrime.securesms.util.ViewUtil;
 import org.thoughtcrime.securesms.util.concurrent.ListenableFuture;
 import org.thoughtcrime.securesms.util.livedata.LiveDataUtil;
-import org.thoughtcrime.securesms.video.exo.AttachmentMediaSourceFactory;
 import org.whispersystems.libsignal.util.guava.Optional;
 
 import java.util.Collection;
@@ -105,9 +102,7 @@ public final class ConversationUpdateItem extends FrameLayout
                    @Nullable String searchQuery,
                    boolean pulseMention,
                    boolean hasWallpaper,
-                   boolean isMessageRequestAccepted,
-                   @NonNull AttachmentMediaSourceFactory attachmentMediaSourceFactory,
-                   boolean allowedToPlayInline)
+                   boolean isMessageRequestAccepted)
   {
     this.batchSelected = batchSelected;
 
@@ -185,30 +180,6 @@ public final class ConversationUpdateItem extends FrameLayout
 
   @Override
   public void unbind() {
-  }
-
-  @Override
-  public void showProjectionArea() {
-  }
-
-  @Override
-  public void hideProjectionArea() {
-    throw new UnsupportedOperationException("Call makes no sense for a conversation update item");
-  }
-
-  @Override
-  public int getAdapterPosition() {
-    throw new UnsupportedOperationException("Don't delegate to this method.");
-  }
-
-  @Override
-  public @NonNull GiphyMp4Projection getProjection(@NonNull RecyclerView recyclerView) {
-    throw new UnsupportedOperationException("ConversationUpdateItems cannot be projected into.");
-  }
-
-  @Override
-  public boolean canPlayContent() {
-    return false;
   }
 
   static final class RecipientObserverManager {

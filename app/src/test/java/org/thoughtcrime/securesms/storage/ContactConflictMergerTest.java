@@ -3,6 +3,7 @@ package org.thoughtcrime.securesms.storage;
 import org.junit.Test;
 import org.signal.core.util.logging.Log;
 import org.thoughtcrime.securesms.recipients.Recipient;
+import org.thoughtcrime.securesms.storage.StorageSyncHelper.KeyGenerator;
 import org.whispersystems.libsignal.util.guava.Optional;
 import org.whispersystems.signalservice.api.push.SignalServiceAddress;
 import org.whispersystems.signalservice.api.storage.SignalContactRecord;
@@ -69,7 +70,7 @@ public class ContactConflictMergerTest {
                                                         .setForcedUnread(true)
                                                         .build();
 
-    SignalContactRecord merged = new ContactConflictMerger(Collections.singletonList(local), SELF).merge(remote, local, mock(StorageKeyGenerator.class));
+    SignalContactRecord merged = new ContactConflictMerger(Collections.singletonList(local), SELF).merge(remote, local, mock(KeyGenerator.class));
 
     assertEquals(UUID_A, merged.getAddress().getUuid().get());
     assertEquals(E164_A, merged.getAddress().getNumber().get());
@@ -102,7 +103,7 @@ public class ContactConflictMergerTest {
                                                           .setUsername("username B")
                                                           .setProfileSharingEnabled(false)
                                                           .build();
-    SignalContactRecord merged = new ContactConflictMerger(Collections.singletonList(local), SELF).merge(remote, local, mock(StorageKeyGenerator.class));
+    SignalContactRecord merged = new ContactConflictMerger(Collections.singletonList(local), SELF).merge(remote, local, mock(KeyGenerator.class));
 
     assertEquals(UUID_A, merged.getAddress().getUuid().get());
     assertEquals(E164_B, merged.getAddress().getNumber().get());
@@ -132,7 +133,7 @@ public class ContactConflictMergerTest {
                                                         .setFamilyName("BLast")
                                                         .setProfileSharingEnabled(false)
                                                         .build();
-    SignalContactRecord merged = new ContactConflictMerger(Collections.singletonList(local), SELF).merge(remote, local, mock(StorageKeyGenerator.class));
+    SignalContactRecord merged = new ContactConflictMerger(Collections.singletonList(local), SELF).merge(remote, local, mock(KeyGenerator.class));
 
     assertEquals(remote, merged);
   }
@@ -144,7 +145,7 @@ public class ContactConflictMergerTest {
                                                         .setGivenName("AFirst")
                                                         .setFamilyName("ALast")
                                                         .build();
-    SignalContactRecord merged = new ContactConflictMerger(Collections.singletonList(local), SELF).merge(remote, local, mock(StorageKeyGenerator.class));
+    SignalContactRecord merged = new ContactConflictMerger(Collections.singletonList(local), SELF).merge(remote, local, mock(KeyGenerator.class));
 
     assertEquals(local, merged);
   }

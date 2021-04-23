@@ -2,6 +2,7 @@ package org.thoughtcrime.securesms.storage;
 
 import org.junit.Test;
 import org.thoughtcrime.securesms.groups.GroupId;
+import org.thoughtcrime.securesms.storage.StorageSyncHelper.KeyGenerator;
 import org.whispersystems.signalservice.api.storage.SignalGroupV1Record;
 
 import java.util.Arrays;
@@ -18,8 +19,8 @@ import static org.thoughtcrime.securesms.testutil.ZkGroupLibraryUtil.assumeZkGro
 
 public final class GroupV1ConflictMergerTest {
 
-  private static final byte[]              GENERATED_KEY = byteArray(8675309);
-  private static final StorageKeyGenerator KEY_GENERATOR = mock(StorageKeyGenerator.class);
+  private static final byte[]       GENERATED_KEY = byteArray(8675309);
+  private static final KeyGenerator KEY_GENERATOR = mock(KeyGenerator.class);
 
   static {
     when(KEY_GENERATOR.generate()).thenReturn(GENERATED_KEY);
@@ -63,7 +64,7 @@ public final class GroupV1ConflictMergerTest {
                                                         .setArchived(false)
                                                         .build();
 
-    SignalGroupV1Record merged = new GroupV1ConflictMerger(Collections.singletonList(local), id -> false).merge(remote, local, mock(StorageKeyGenerator.class));
+    SignalGroupV1Record merged = new GroupV1ConflictMerger(Collections.singletonList(local), id -> false).merge(remote, local, mock(KeyGenerator.class));
 
     assertEquals(remote, merged);
   }

@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2014-2016 Open Whisper Systems
  *
  * Licensed according to the LICENSE file in this repository.
@@ -27,7 +27,6 @@ public class SignalServiceSyncMessage {
   private final Optional<FetchType>                         fetchType;
   private final Optional<KeysMessage>                       keys;
   private final Optional<MessageRequestResponseMessage>     messageRequestResponse;
-  private final Optional<OutgoingPaymentMessage>            outgoingPaymentMessage;
 
   private SignalServiceSyncMessage(Optional<SentTranscriptMessage>             sent,
                                    Optional<ContactsMessage>                   contacts,
@@ -41,8 +40,7 @@ public class SignalServiceSyncMessage {
                                    Optional<List<StickerPackOperationMessage>> stickerPackOperations,
                                    Optional<FetchType>                         fetchType,
                                    Optional<KeysMessage>                       keys,
-                                   Optional<MessageRequestResponseMessage>     messageRequestResponse,
-                                   Optional<OutgoingPaymentMessage>            outgoingPaymentMessage)
+                                   Optional<MessageRequestResponseMessage>     messageRequestResponse)
   {
     this.sent                   = sent;
     this.contacts               = contacts;
@@ -57,282 +55,249 @@ public class SignalServiceSyncMessage {
     this.fetchType              = fetchType;
     this.keys                   = keys;
     this.messageRequestResponse = messageRequestResponse;
-    this.outgoingPaymentMessage = outgoingPaymentMessage;
   }
 
   public static SignalServiceSyncMessage forSentTranscript(SentTranscriptMessage sent) {
     return new SignalServiceSyncMessage(Optional.of(sent),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent());
+                                        Optional.<ContactsMessage>absent(),
+                                        Optional.<SignalServiceAttachment>absent(),
+                                        Optional.<BlockedListMessage>absent(),
+                                        Optional.<RequestMessage>absent(),
+                                        Optional.<List<ReadMessage>>absent(),
+                                        Optional.<ViewOnceOpenMessage>absent(),
+                                        Optional.<VerifiedMessage>absent(),
+                                        Optional.<ConfigurationMessage>absent(),
+                                        Optional.<List<StickerPackOperationMessage>>absent(),
+                                        Optional.<FetchType>absent(),
+                                        Optional.<KeysMessage>absent(),
+                                        Optional.<MessageRequestResponseMessage>absent());
   }
 
   public static SignalServiceSyncMessage forContacts(ContactsMessage contacts) {
-    return new SignalServiceSyncMessage(Optional.absent(),
+    return new SignalServiceSyncMessage(Optional.<SentTranscriptMessage>absent(),
                                         Optional.of(contacts),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent());
+                                        Optional.<SignalServiceAttachment>absent(),
+                                        Optional.<BlockedListMessage>absent(),
+                                        Optional.<RequestMessage>absent(),
+                                        Optional.<List<ReadMessage>>absent(),
+                                        Optional.<ViewOnceOpenMessage>absent(),
+                                        Optional.<VerifiedMessage>absent(),
+                                        Optional.<ConfigurationMessage>absent(),
+                                        Optional.<List<StickerPackOperationMessage>>absent(),
+                                        Optional.<FetchType>absent(),
+                                        Optional.<KeysMessage>absent(),
+                                        Optional.<MessageRequestResponseMessage>absent());
   }
 
   public static SignalServiceSyncMessage forGroups(SignalServiceAttachment groups) {
-    return new SignalServiceSyncMessage(Optional.absent(),
-                                        Optional.absent(),
+    return new SignalServiceSyncMessage(Optional.<SentTranscriptMessage>absent(),
+                                        Optional.<ContactsMessage>absent(),
                                         Optional.of(groups),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent());
+                                        Optional.<BlockedListMessage>absent(),
+                                        Optional.<RequestMessage>absent(),
+                                        Optional.<List<ReadMessage>>absent(),
+                                        Optional.<ViewOnceOpenMessage>absent(),
+                                        Optional.<VerifiedMessage>absent(),
+                                        Optional.<ConfigurationMessage>absent(),
+                                        Optional.<List<StickerPackOperationMessage>>absent(),
+                                        Optional.<FetchType>absent(),
+                                        Optional.<KeysMessage>absent(),
+                                        Optional.<MessageRequestResponseMessage>absent());
   }
 
   public static SignalServiceSyncMessage forRequest(RequestMessage request) {
-    return new SignalServiceSyncMessage(Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
+    return new SignalServiceSyncMessage(Optional.<SentTranscriptMessage>absent(),
+                                        Optional.<ContactsMessage>absent(),
+                                        Optional.<SignalServiceAttachment>absent(),
+                                        Optional.<BlockedListMessage>absent(),
                                         Optional.of(request),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent());
+                                        Optional.<List<ReadMessage>>absent(),
+                                        Optional.<ViewOnceOpenMessage>absent(),
+                                        Optional.<VerifiedMessage>absent(),
+                                        Optional.<ConfigurationMessage>absent(),
+                                        Optional.<List<StickerPackOperationMessage>>absent(),
+                                        Optional.<FetchType>absent(),
+                                        Optional.<KeysMessage>absent(),
+                                        Optional.<MessageRequestResponseMessage>absent());
   }
 
   public static SignalServiceSyncMessage forRead(List<ReadMessage> reads) {
-    return new SignalServiceSyncMessage(Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
+    return new SignalServiceSyncMessage(Optional.<SentTranscriptMessage>absent(),
+                                        Optional.<ContactsMessage>absent(),
+                                        Optional.<SignalServiceAttachment>absent(),
+                                        Optional.<BlockedListMessage>absent(),
+                                        Optional.<RequestMessage>absent(),
                                         Optional.of(reads),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent());
+                                        Optional.<ViewOnceOpenMessage>absent(),
+                                        Optional.<VerifiedMessage>absent(),
+                                        Optional.<ConfigurationMessage>absent(),
+                                        Optional.<List<StickerPackOperationMessage>>absent(),
+                                        Optional.<FetchType>absent(),
+                                        Optional.<KeysMessage>absent(),
+                                        Optional.<MessageRequestResponseMessage>absent());
   }
 
   public static SignalServiceSyncMessage forViewOnceOpen(ViewOnceOpenMessage timerRead) {
-    return new SignalServiceSyncMessage(Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
+    return new SignalServiceSyncMessage(Optional.<SentTranscriptMessage>absent(),
+                                        Optional.<ContactsMessage>absent(),
+                                        Optional.<SignalServiceAttachment>absent(),
+                                        Optional.<BlockedListMessage>absent(),
+                                        Optional.<RequestMessage>absent(),
+                                        Optional.<List<ReadMessage>>absent(),
                                         Optional.of(timerRead),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent());
+                                        Optional.<VerifiedMessage>absent(),
+                                        Optional.<ConfigurationMessage>absent(),
+                                        Optional.<List<StickerPackOperationMessage>>absent(),
+                                        Optional.<FetchType>absent(),
+                                        Optional.<KeysMessage>absent(),
+                                        Optional.<MessageRequestResponseMessage>absent());
   }
 
   public static SignalServiceSyncMessage forRead(ReadMessage read) {
     List<ReadMessage> reads = new LinkedList<>();
     reads.add(read);
 
-    return new SignalServiceSyncMessage(Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
+    return new SignalServiceSyncMessage(Optional.<SentTranscriptMessage>absent(),
+                                        Optional.<ContactsMessage>absent(),
+                                        Optional.<SignalServiceAttachment>absent(),
+                                        Optional.<BlockedListMessage>absent(),
+                                        Optional.<RequestMessage>absent(),
                                         Optional.of(reads),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent());
+                                        Optional.<ViewOnceOpenMessage>absent(),
+                                        Optional.<VerifiedMessage>absent(),
+                                        Optional.<ConfigurationMessage>absent(),
+                                        Optional.<List<StickerPackOperationMessage>>absent(),
+                                        Optional.<FetchType>absent(),
+                                        Optional.<KeysMessage>absent(),
+                                        Optional.<MessageRequestResponseMessage>absent());
   }
 
   public static SignalServiceSyncMessage forVerified(VerifiedMessage verifiedMessage) {
-    return new SignalServiceSyncMessage(Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
+    return new SignalServiceSyncMessage(Optional.<SentTranscriptMessage>absent(),
+                                        Optional.<ContactsMessage>absent(),
+                                        Optional.<SignalServiceAttachment>absent(),
+                                        Optional.<BlockedListMessage>absent(),
+                                        Optional.<RequestMessage>absent(),
+                                        Optional.<List<ReadMessage>>absent(),
+                                        Optional.<ViewOnceOpenMessage>absent(),
                                         Optional.of(verifiedMessage),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent());
+                                        Optional.<ConfigurationMessage>absent(),
+                                        Optional.<List<StickerPackOperationMessage>>absent(),
+                                        Optional.<FetchType>absent(),
+                                        Optional.<KeysMessage>absent(),
+                                        Optional.<MessageRequestResponseMessage>absent());
   }
 
   public static SignalServiceSyncMessage forBlocked(BlockedListMessage blocked) {
-    return new SignalServiceSyncMessage(Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
+    return new SignalServiceSyncMessage(Optional.<SentTranscriptMessage>absent(),
+                                        Optional.<ContactsMessage>absent(),
+                                        Optional.<SignalServiceAttachment>absent(),
                                         Optional.of(blocked),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent());
+                                        Optional.<RequestMessage>absent(),
+                                        Optional.<List<ReadMessage>>absent(),
+                                        Optional.<ViewOnceOpenMessage>absent(),
+                                        Optional.<VerifiedMessage>absent(),
+                                        Optional.<ConfigurationMessage>absent(),
+                                        Optional.<List<StickerPackOperationMessage>>absent(),
+                                        Optional.<FetchType>absent(),
+                                        Optional.<KeysMessage>absent(),
+                                        Optional.<MessageRequestResponseMessage>absent());
   }
 
   public static SignalServiceSyncMessage forConfiguration(ConfigurationMessage configuration) {
-    return new SignalServiceSyncMessage(Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
+    return new SignalServiceSyncMessage(Optional.<SentTranscriptMessage>absent(),
+                                        Optional.<ContactsMessage>absent(),
+                                        Optional.<SignalServiceAttachment>absent(),
+                                        Optional.<BlockedListMessage>absent(),
+                                        Optional.<RequestMessage>absent(),
+                                        Optional.<List<ReadMessage>>absent(),
+                                        Optional.<ViewOnceOpenMessage>absent(),
+                                        Optional.<VerifiedMessage>absent(),
                                         Optional.of(configuration),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent());
+                                        Optional.<List<StickerPackOperationMessage>>absent(),
+                                        Optional.<FetchType>absent(),
+                                        Optional.<KeysMessage>absent(),
+                                        Optional.<MessageRequestResponseMessage>absent());
   }
 
   public static SignalServiceSyncMessage forStickerPackOperations(List<StickerPackOperationMessage> stickerPackOperations) {
-    return new SignalServiceSyncMessage(Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
+    return new SignalServiceSyncMessage(Optional.<SentTranscriptMessage>absent(),
+                                        Optional.<ContactsMessage>absent(),
+                                        Optional.<SignalServiceAttachment>absent(),
+                                        Optional.<BlockedListMessage>absent(),
+                                        Optional.<RequestMessage>absent(),
+                                        Optional.<List<ReadMessage>>absent(),
+                                        Optional.<ViewOnceOpenMessage>absent(),
+                                        Optional.<VerifiedMessage>absent(),
+                                        Optional.<ConfigurationMessage>absent(),
                                         Optional.of(stickerPackOperations),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent());
+                                        Optional.<FetchType>absent(),
+                                        Optional.<KeysMessage>absent(),
+                                        Optional.<MessageRequestResponseMessage>absent());
   }
 
   public static SignalServiceSyncMessage forFetchLatest(FetchType fetchType) {
-    return new SignalServiceSyncMessage(Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
+    return new SignalServiceSyncMessage(Optional.<SentTranscriptMessage>absent(),
+                                        Optional.<ContactsMessage>absent(),
+                                        Optional.<SignalServiceAttachment>absent(),
+                                        Optional.<BlockedListMessage>absent(),
+                                        Optional.<RequestMessage>absent(),
+                                        Optional.<List<ReadMessage>>absent(),
+                                        Optional.<ViewOnceOpenMessage>absent(),
+                                        Optional.<VerifiedMessage>absent(),
+                                        Optional.<ConfigurationMessage>absent(),
+                                        Optional.<List<StickerPackOperationMessage>>absent(),
                                         Optional.of(fetchType),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent());
+                                        Optional.<KeysMessage>absent(),
+                                        Optional.<MessageRequestResponseMessage>absent());
   }
 
   public static SignalServiceSyncMessage forKeys(KeysMessage keys) {
-    return new SignalServiceSyncMessage(Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
+    return new SignalServiceSyncMessage(Optional.<SentTranscriptMessage>absent(),
+                                        Optional.<ContactsMessage>absent(),
+                                        Optional.<SignalServiceAttachment>absent(),
+                                        Optional.<BlockedListMessage>absent(),
+                                        Optional.<RequestMessage>absent(),
+                                        Optional.<List<ReadMessage>>absent(),
+                                        Optional.<ViewOnceOpenMessage>absent(),
+                                        Optional.<VerifiedMessage>absent(),
+                                        Optional.<ConfigurationMessage>absent(),
+                                        Optional.<List<StickerPackOperationMessage>>absent(),
+                                        Optional.<FetchType>absent(),
                                         Optional.of(keys),
-                                        Optional.absent(),
-                                        Optional.absent());
+                                        Optional.<MessageRequestResponseMessage>absent());
   }
 
   public static SignalServiceSyncMessage forMessageRequestResponse(MessageRequestResponseMessage messageRequestResponse) {
-    return new SignalServiceSyncMessage(Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.of(messageRequestResponse),
-                                        Optional.absent());
-  }
-
-  public static SignalServiceSyncMessage forOutgoingPayment(OutgoingPaymentMessage outgoingPaymentMessage) {
-    return new SignalServiceSyncMessage(Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.of(outgoingPaymentMessage));
+    return new SignalServiceSyncMessage(Optional.<SentTranscriptMessage>absent(),
+        Optional.<ContactsMessage>absent(),
+        Optional.<SignalServiceAttachment>absent(),
+        Optional.<BlockedListMessage>absent(),
+        Optional.<RequestMessage>absent(),
+        Optional.<List<ReadMessage>>absent(),
+        Optional.<ViewOnceOpenMessage>absent(),
+        Optional.<VerifiedMessage>absent(),
+        Optional.<ConfigurationMessage>absent(),
+        Optional.<List<StickerPackOperationMessage>>absent(),
+        Optional.<FetchType>absent(),
+        Optional.<KeysMessage>absent(),
+        Optional.of(messageRequestResponse));
   }
 
   public static SignalServiceSyncMessage empty() {
-    return new SignalServiceSyncMessage(Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent(),
-                                        Optional.absent());
+    return new SignalServiceSyncMessage(Optional.<SentTranscriptMessage>absent(),
+        Optional.<ContactsMessage>absent(),
+        Optional.<SignalServiceAttachment>absent(),
+        Optional.<BlockedListMessage>absent(),
+        Optional.<RequestMessage>absent(),
+                                        Optional.<List<ReadMessage>>absent(),
+                                        Optional.<ViewOnceOpenMessage>absent(),
+                                        Optional.<VerifiedMessage>absent(),
+                                        Optional.<ConfigurationMessage>absent(),
+                                        Optional.<List<StickerPackOperationMessage>>absent(),
+                                        Optional.<FetchType>absent(),
+                                        Optional.<KeysMessage>absent(),
+                                        Optional.<MessageRequestResponseMessage>absent());
   }
 
   public Optional<SentTranscriptMessage> getSent() {
@@ -385,10 +350,6 @@ public class SignalServiceSyncMessage {
 
   public Optional<MessageRequestResponseMessage> getMessageRequestResponse() {
     return messageRequestResponse;
-  }
-
-  public Optional<OutgoingPaymentMessage> getOutgoingPaymentMessage() {
-    return outgoingPaymentMessage;
   }
 
   public enum FetchType {
